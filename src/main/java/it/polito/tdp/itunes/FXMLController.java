@@ -6,6 +6,9 @@ package it.polito.tdp.itunes;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import it.polito.tdp.itunes.model.CoppiaA;
+import it.polito.tdp.itunes.model.Genre;
 import it.polito.tdp.itunes.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -37,7 +40,7 @@ public class FXMLController {
     private ComboBox<?> cmbCanzone; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGenere"
-    private ComboBox<?> cmbGenere; // Value injected by FXMLLoader
+    private ComboBox<String> cmbGenere; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtMemoria"
     private TextField txtMemoria; // Value injected by FXMLLoader
@@ -52,12 +55,25 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
-
+    	String genreNAME = this.cmbGenere.getValue();
+    	if(genreNAME == null) {
+    		this.txtResult.setText("Inserire un genere nella box genere");
+    		return;
+    	}
+    	String res = model.creaGrafo(genreNAME);
+    	this.txtResult.setText(res);
+    	
     }
 
     @FXML
     void doDeltaMassimo(ActionEvent event) {
-    	
+    	String genreName = this.cmbGenere.getValue();
+    	if(genreName == null) {
+    		this.txtResult.setText("Inserire un genere nella box genere");
+    		return;
+    	}
+    	CoppiaA c = model.trovaArcoPiuPesante(genreName);
+    	this.txtResult.setText("Arco piu pesante : "+c.getT1()+"<--->"+c.getT2()+" ("+c.getPeso()+") ");
     	
     }
 
@@ -75,6 +91,9 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	for(Genre x : model.getNameGenresMap().values()) {
+    		this.cmbGenere.getItems().add(x.getName());
+    	}
     }
 
 }
