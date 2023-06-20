@@ -5,11 +5,14 @@
 package it.polito.tdp.itunes;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.itunes.model.CoppiaA;
 import it.polito.tdp.itunes.model.Genre;
 import it.polito.tdp.itunes.model.Model;
+import it.polito.tdp.itunes.model.Track;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -37,7 +40,7 @@ public class FXMLController {
     private Button btnMassimo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCanzone"
-    private ComboBox<?> cmbCanzone; // Value injected by FXMLLoader
+    private ComboBox<String> cmbCanzone; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbGenere"
     private ComboBox<String> cmbGenere; // Value injected by FXMLLoader
@@ -50,7 +53,32 @@ public class FXMLController {
 
     @FXML
     void btnCreaLista(ActionEvent event) {
-
+    	String trackNAME = this.cmbCanzone.getValue();
+    	String maxBytes = this.txtMemoria.getText();
+    	Integer nMaxBytes;
+    	String s = "Playlist creata: \n";
+    	
+    	if(trackNAME == null) {
+			this.txtResult.setText("Selezionare una Canzone nella box Canzoni!");
+			return;
+		}
+    	try {
+    		nMaxBytes = Integer.parseInt(maxBytes);
+    		if(maxBytes == null) {
+    			this.txtResult.setText("Inserire un valore nel campo MaxBytes!");
+    			return;
+    		}
+    		model.calcolaPlaylist(trackNAME, nMaxBytes);
+    		List<Track>r = new ArrayList<>(model.getPlaylistMigliore());
+    		for(Track x : r) {
+    			s += "\n" + x.getName();
+    		}
+    		this.txtResult.setText(s);
+    		
+    	}catch(NumberFormatException e) {
+    		this.txtResult.setText("Inserire un numero nel campo MaxBytes!");
+    		return;
+    	}
     }
 
     @FXML
@@ -62,6 +90,10 @@ public class FXMLController {
     	}
     	String res = model.creaGrafo(genreNAME);
     	this.txtResult.setText(res);
+    	//popolo la lista di canzoni con i vertici del grafo appena creato
+    	for(Track x: model.getGrafo().vertexSet()) {
+    		this.cmbCanzone.getItems().add(x.getName());
+    	}
     	
     }
 
@@ -73,7 +105,7 @@ public class FXMLController {
     		return;
     	}
     	CoppiaA c = model.trovaArcoPiuPesante(genreName);
-    	this.txtResult.setText("Arco piu pesante : "+c.getT1()+"<--->"+c.getT2()+" ("+c.getPeso()+") ");
+    	this.txtResult.appendText("\nArco piu pesante : "+c.getT1()+"<--->"+c.getT2()+" ("+c.getPeso()+") ");
     	
     }
 

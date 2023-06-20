@@ -230,6 +230,26 @@ public class ItunesDAO {
 		return peso;
 	}
 
-	
+	public Integer getNumeroBytes(Integer t1id) {
+		final String sql = "SELECT t.Bytes "
+				+ "FROM track t "
+				+ "WHERE t.TrackId = ? ";
+		Integer nBytes = 0;
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, t1id);
+			ResultSet res = st.executeQuery();
+
+			if (res.first()) {
+				nBytes = res.getInt("Bytes");
+			}
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new RuntimeException("SQL Error");
+		}
+		return nBytes;
+	}
 	
 }
